@@ -1,0 +1,10 @@
+August 4th, 2020
+
+Two days back, I wanted to create a framework/template code for running simulations
+of Multi-Armed-Bandits (MAB) algorithms, and started this Python project for that purpose.
+
+August 6th.
+    - First basic version is done.
+    - Ran UCB1 algo and plotted the empirical regret and theoretical bounds. Things work well.
+
+    - I have to replace lists with numpy arrays for cleaner code and better perf.
