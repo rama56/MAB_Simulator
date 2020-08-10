@@ -1,5 +1,6 @@
 from scipy.stats import bernoulli
 import numpy as np
+import math
 
 
 class MathHelper:
@@ -38,3 +39,9 @@ class MathHelper:
         # if x < 1:
         #     return 0
         return np.log(x)
+
+    @staticmethod
+    def ceiled_log_base_2(x):
+        a = np.log2(x)
+        return math.ceil(a)
+        pass

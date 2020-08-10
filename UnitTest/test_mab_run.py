@@ -19,27 +19,35 @@ class Test(TestCase):
         total = sum(rewards)
 
         assert arm.pull_count == 20
-
-        x = 5
     # end def
 
     def test_mab_run(self):
-
-        million = 10 ** 6
-        thousand = 10 ** 3
-
-        mab = MultiArmedBandit(k=5, t=million)
+        mab = MultiArmedBandit(k=5, t=10 ** 4)
 
         mab.run_bandit_algorithm()
 
         mab.analyse_regret()
         mab.analyse_suboptimal_arm_pulls()
-
         # mab.print_performance()
         mab.plot_suboptimal_arm()
         mab.plot_regret()
 
         mab.ph.show_plots()
 
-        a = 5
+    # end def
+
+    def test_mab_run_many_arms(self):
+
+        mab = MultiArmedBandit(k=100, t=10**6)
+
+        mab.run_bandit_algorithm()
+
+        # With many arms, we don't analyse pulls of sub-optimal arms.
+        mab.analyse_regret()
+        mab.print_performance()
+        mab.plot_regret()
+
+        mab.ph.show_plots()
+
+    # end def
 

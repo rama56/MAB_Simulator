@@ -1,6 +1,6 @@
 from Algorithms.ucb import UCB
 
-from misc_helper import MiscellaneousHelper as mh
+from Helpers.misc_helper import MiscellaneousHelper as mh
 
 
 class UCB1(UCB):

@@ -1,7 +1,5 @@
 import abc  # Abstract Base Class
 
-from misc_helper import MiscellaneousHelper as mh
-
 
 class UCB(abc.ABC):
     arms = 0

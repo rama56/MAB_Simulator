@@ -1,7 +1,9 @@
 import numpy as np
 import math
 
-from math_helper import MathHelper as rvh
+from arm import Arm
+from Helpers.math_helper import MathHelper as rvh
+
 
 class MiscellaneousHelper:
 
@@ -11,6 +13,20 @@ class MiscellaneousHelper:
         idx = np.argmax(a)
         return idx
 
+    @staticmethod
+    def get_arms(arm_count, tape_size):
+        true_means = rvh.get_uniform_sample(0, 1, arm_count)
+        arms = []
+        for i in range(arm_count):
+            arm = Arm(true_means[i], size=tape_size)
+            arms.append(arm)
+
+        return true_means, arms
+
+    @staticmethod
+    def ucb_doubling_radius(n, pull_count):
+        radius = math.sqrt((2 * math.log(math.log(n))) / pull_count)
+        return radius
 
     @staticmethod
     def textbook_radius(t, pull_count):
@@ -60,8 +76,16 @@ class MiscellaneousHelper:
                 del_sq_inv = 1 / pow(deltas[i], 2)
                 del_sq_invs[i] = del_sq_inv
 
-        return del_sq_invs
+        return 8 * del_sq_invs
 
     @staticmethod
     def stringify(fl):
         return str(round(fl, 2))
+
+    @staticmethod
+    def stringify_list(fl_list):
+        readable = ""
+        for fl in fl_list:
+            readable = readable + "  " + MiscellaneousHelper.stringify(fl)
+
+        return readable

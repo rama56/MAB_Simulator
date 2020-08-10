@@ -7,4 +7,12 @@ August 6th.
     - First basic version is done.
     - Ran UCB1 algo and plotted the empirical regret and theoretical bounds. Things work well.
 
-    - I have to replace lists with numpy arrays for cleaner code and better perf.
+August 9th
+    - Using numpy arrays instead of lists
+    - Implememnted UCB-Incremental and UCB-Doubling algorithms
+
+    - Sometimes, regret seems to be going down considerably with time. Is there any bug in the algo?
+
+August 10th
+    - Added UCB-Doubling-TR (Tighter Radius) algorithm.
+    - Added a experiment runner, to run MAB algorithms multiple times to get 'average' regret.

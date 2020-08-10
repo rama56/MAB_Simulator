@@ -1,6 +1,6 @@
 
 from unittest import TestCase
-from math_helper import MathHelper as rvh
+from Helpers.math_helper import MathHelper as rvh
 
 
 class Test(TestCase):

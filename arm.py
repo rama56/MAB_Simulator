@@ -1,4 +1,4 @@
-from math_helper import MathHelper as rvh
+from Helpers.math_helper import MathHelper as rvh
 
 
 class Arm:
@@ -10,7 +10,7 @@ class Arm:
     reward_sum = 0
     empirical_mean = 0
 
-    def __init__(self, mean, size=10 ** 6):
+    def __init__(self, mean, size=10 ** 7):
         self._mean = mean
 
         # Create a tape of values to return.

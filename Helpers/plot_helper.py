@@ -1,7 +1,4 @@
-
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-import pylab
 
 
 class PlotHelper:
@@ -44,7 +41,6 @@ class PlotHelper:
 
         i = 0
         for curve in self.curves:
-            # self.ax.plot(x_axis, curve[0], self.colours[curve[2]], label=curve[1], linestyle=curve[3])
             plt.plot(x_axis, curve[0], self.colours[curve[2]], label=curve[1], linestyle=curve[3])
             i = i + 1
 
@@ -54,8 +50,9 @@ class PlotHelper:
     def set_logarithmic_x_axis(self, flag):
         self.is_x_axis_logarithmic = flag
 
-    def initiate_figure(self, title, x_label, y_label,  x_log=True, y_log=True):
-        fig = plt.figure(figsize=(10,10))
+    @staticmethod
+    def initiate_figure(title, x_label, y_label,  x_log=True, y_log=True):
+        fig = plt.figure(figsize=(9, 9))
         fig.suptitle(title)
         plt.grid(True)
 
@@ -68,5 +65,6 @@ class PlotHelper:
         if y_log:
             plt.yscale('log')
 
-    def show_plots(self):
+    @staticmethod
+    def show_plots():
         plt.show()
