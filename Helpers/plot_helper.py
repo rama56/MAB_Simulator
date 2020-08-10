@@ -7,8 +7,8 @@ class PlotHelper:
 
     # Constant variables
     colours = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'burlywood', 'chartreuse', '0.5', '0.9', '0.2']
+    line_styles = ['solid', 'dashed', 'dotted', 'dashdot', '-', '--', '-.', ':', 'None', ' ', '']
 
-    is_x_axis_logarithmic = False
     fig = None
     ax = None
     x_axis_range = 0
@@ -23,7 +23,7 @@ class PlotHelper:
     def clear_curves(self):
         self.curves = []
 
-    def add_curve(self, y_values, label, color_id, linestyle='solid'):
+    def add_curve(self, y_values, label, color_id, linestyle=0):
         curve_element = (y_values, label, color_id, linestyle)
 
         self.curves.append(curve_element)
@@ -41,14 +41,11 @@ class PlotHelper:
 
         i = 0
         for curve in self.curves:
-            plt.plot(x_axis, curve[0], self.colours[curve[2]], label=curve[1], linestyle=curve[3])
+            plt.plot(x_axis, curve[0], self.colours[curve[2]], label=curve[1], linestyle=self.line_styles[curve[3]])
             i = i + 1
 
         plt.legend(loc='upper left')
     # end def
-
-    def set_logarithmic_x_axis(self, flag):
-        self.is_x_axis_logarithmic = flag
 
     @staticmethod
     def initiate_figure(title, x_label, y_label,  x_log=True, y_log=True):

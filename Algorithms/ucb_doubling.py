@@ -8,11 +8,12 @@ class UCBDoubling(UCB):
 
     radius_function = None
 
-    def __init__(self, arms, t, n, radius_function=mh.textbook_radius):
+    def __init__(self, arms, t, n, radius_function=None):
 
         super().__init__(arms, t, n)
 
-        self.radius_function = radius_function
+        if radius_function is not None:
+            self.radius_function = radius_function
 
     def play_arms(self):
         rewards = [0]

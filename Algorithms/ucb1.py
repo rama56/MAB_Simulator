@@ -33,8 +33,9 @@ class UCB1(UCB):
 
     def revise_ucbs(self, t):
         for i in range(self.K):
-            self.upper_confidence_bound[i] = mh.textbook_radius(t, self.arms[i].pull_count) + \
+            self.upper_confidence_bound[i] = self.radius_function(t, self.arms[i].pull_count) + \
                                              self.arms[i].empirical_mean
+            # radius_function =  mh.textbook_radius
         # end for
     # end def
 

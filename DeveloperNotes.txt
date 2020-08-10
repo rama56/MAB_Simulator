@@ -16,3 +16,4 @@ August 9th
 August 10th
     - Added UCB-Doubling-TR (Tighter Radius) algorithm.
     - Added a experiment runner, to run MAB algorithms multiple times to get 'average' regret.
+    - Refactored the usage of a list of algorithms. Greatly improves code control.

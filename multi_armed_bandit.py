@@ -19,15 +19,11 @@ class MultiArmedBandit:
     true_means = None
     K = 0
     T = 0
-    rewards = []
-    rewards_incremental = []
-    rewards_doubling = []
-    rewards_doubling_tr = []
+
+    algorithms_to_run = None
+    algo_count = 0
 
     cum_reward_empirical = None
-    cum_reward_empirical_incremental = None
-    cum_reward_empirical_doubling = None
-    cum_reward_empirical_doubling_tr = None
 
     """ Objects that are a part of the analysis of the performance. """
 
@@ -36,18 +32,11 @@ class MultiArmedBandit:
 
     # Cumulative regret, rewards are computed for all time-steps, as a list.
     cum_optimal_reward = None
-    cum_regret_theo_bound = None
-
-    cum_pulls_doubling_tr = None
-    cum_pulls_doubling = None
-    cum_pulls_incremental = None
-    cum_pulls = None
 
     cum_regret_empirical = None
-    cum_regret_empirical_incremental = None
-    cum_regret_empirical_doubling = None
-    cum_regret_empirical_doubling_tr = None
+    cum_regret_theo_bound = None
 
+    cum_pulls = None
     theoretical_bounds_arm_pulls = None
 
     """ Functions to create, run, and analyse MABs. """
@@ -63,72 +52,46 @@ class MultiArmedBandit:
         self.deltas = [0] * self.K
 
         # Create the arms
-
         self.true_means, self.arms = mh.get_arms(self.K, self.T)
 
-        # Create the algorithm object
-        self.algorithm = UCB1(arms=self.arms, t=self.T, n=self.T)
+    def set_algorithms(self, algorithms_to_run):
+        self.algorithms_to_run = algorithms_to_run
+        self.algo_count = len(algorithms_to_run)
+
+        self.cum_pulls = [None] * self.algo_count
+        self.cum_regret_empirical = [None] * self.algo_count
+        self.cum_reward_empirical = [None] * self.algo_count
 
     def run_bandit_algorithm(self):
-        # Use the algorithm to pull the required number of arms in the required time.
-        self.logger.debug("To start UCB1")
 
-        rewards_list = self.algorithm.play_arms()
+        for i in range(self.algo_count):
+            algo = self.algorithms_to_run[i]
 
-        self.rewards = np.array(rewards_list)
+            algo_name = algo[0]
+            algo_class = algo[1]
 
-        pull_matrix = self.algorithm.arm_pulls_by_time
-        pull_ndarray = np.array(pull_matrix)
+            algorithm = algo_class(arms=self.arms, t=self.T, n=self.T)
 
-        self.cum_pulls = np.cumsum(pull_ndarray, axis=0)
+            if len(algo) > 2:
+                algorithm = algo_class(arms=self.arms, t=self.T, n=self.T, radius_function=algo[2])
 
-        for arm in self.arms:
-            arm.reset_counts()
+            self.logger.debug("To start " + algo_name)
 
-        self.logger.debug("To start UCB_Inc")
+            rewards_list = algorithm.play_arms()
 
-        # Incremental algo
-        self.algorithm = UCBIncremental(arms=self.arms, t=self.T, n=self.T)
-        rewards_incremental_list = self.algorithm.play_arms()
-        self.rewards_incremental = np.array(rewards_incremental_list)
+            rewards_np_array = np.array(rewards_list)
+            self.cum_reward_empirical[i] = np.cumsum(rewards_np_array)
 
-        pull_matrix = self.algorithm.arm_pulls_by_time
-        pull_ndarray = np.array(pull_matrix)
+            pull_matrix = algorithm.arm_pulls_by_time
+            pull_ndarray = np.array(pull_matrix)
 
-        self.cum_pulls_incremental = np.cumsum(pull_ndarray, axis=0)
+            self.cum_pulls[i] = np.cumsum(pull_ndarray, axis=0)
 
-        for arm in self.arms:
-            arm.reset_counts()
-
-        self.logger.debug("To start UCB_Doub")
-
-        # Doubling algo
-        self.algorithm = UCBDoubling(arms=self.arms, t=self.T, n=self.T)
-        rewards_doubling_list = self.algorithm.play_arms()
-        self.rewards_doubling = np.array(rewards_doubling_list)
-
-        pull_matrix = self.algorithm.arm_pulls_by_time
-        pull_ndarray = np.array(pull_matrix)
-
-        self.cum_pulls_doubling = np.cumsum(pull_ndarray, axis=0)
-
-        for arm in self.arms:
-            arm.reset_counts()
-
-        self.logger.debug("To start UCB_Doub-TR")
-
-        # Doubling algo - tighter radius
-        self.algorithm = UCBDoubling(arms=self.arms, t=self.T, n=self.T, radius_function=mh.ucb_doubling_radius)
-        rewards_doubling_tr_list = self.algorithm.play_arms()
-        self.rewards_doubling_tr = np.array(rewards_doubling_tr_list)
-
-        pull_matrix = self.algorithm.arm_pulls_by_time
-        pull_ndarray = np.array(pull_matrix)
-
-        self.cum_pulls_doubling_tr = np.cumsum(pull_ndarray, axis=0)
-
-        for arm in self.arms:
-            arm.reset_counts()
+            for arm in self.arms:
+                arm.reset_counts()
+            # end for
+        # end for
+    # end run_bandit_algorithm
 
     def analyse_suboptimal_arm_pulls(self):
         # Compute deltas and theoretical upper bound of playing each sub-optimal arm.
@@ -160,16 +123,10 @@ class MultiArmedBandit:
         self.analyse_common_stats()
 
         # Compute cumulative empirical rewards
-        self.cum_reward_empirical = np.cumsum(self.rewards)
-        self.cum_reward_empirical_incremental = np.cumsum(self.rewards_incremental)
-        self.cum_reward_empirical_doubling = np.cumsum(self.rewards_doubling)
-        self.cum_reward_empirical_doubling_tr = np.cumsum(self.rewards_doubling_tr)
 
-        # Compute cumulative empirical regret
-        self.cum_regret_empirical = self.cum_optimal_reward - self.cum_reward_empirical
-        self.cum_regret_empirical_incremental = self.cum_optimal_reward - self.cum_reward_empirical_incremental
-        self.cum_regret_empirical_doubling = self.cum_optimal_reward - self.cum_reward_empirical_doubling
-        self.cum_regret_empirical_doubling_tr = self.cum_optimal_reward - self.cum_reward_empirical_doubling_tr
+        for i in range(self.algo_count):
+            # Compute cumulative empirical regret
+            self.cum_regret_empirical[i] = self.cum_optimal_reward - self.cum_reward_empirical[i]
 
     # end def analyse_regret
 
@@ -177,44 +134,36 @@ class MultiArmedBandit:
 
         self.ph.initiate_figure("#Pulls of sub-optimal arms vs Time", "Time T", "#Pulls", x_log=False, y_log=True)
 
-        for col in range(self.K):
+        for col in range(self.K):   # For each arm,
             theoretical_bound = self.theoretical_bounds_arm_pulls[:, col]
-            empirical_pulls = self.cum_pulls[:, col]
-            empirical_pulls_incremental = self.cum_pulls_incremental[:, col]
-            empirical_pulls_doubling = self.cum_pulls_doubling[:, col]
-            empirical_pulls_doubling_tr = self.cum_pulls_doubling_tr[:, col]
-
-            # empirical_pulls_incremental
-
-            #  '-', '--', '-.', ':', 'None', ' ', '', 'solid', 'dashed', 'dashdot', 'dotted'
 
             if col != self.best_arm:
-                self.ph.add_curve(theoretical_bound, mh.stringify(self.true_means[col]) + " theo", col, 'solid')
+                self.ph.add_curve(theoretical_bound, mh.stringify(self.true_means[col]) + " Theo", col, 0)
 
-            self.ph.add_curve(empirical_pulls, mh.stringify(self.true_means[col]) + " UCB1", col, 'dotted')
-            self.ph.add_curve(empirical_pulls_incremental, mh.stringify(self.true_means[col]) + " UCB-Inc", col, 'dashed')
-            self.ph.add_curve(empirical_pulls_doubling, mh.stringify(self.true_means[col]) + " UCB-Doub", col, '-.')
-            self.ph.add_curve(empirical_pulls_doubling_tr, mh.stringify(self.true_means[col]) + " UCB-Doub-TR", col, '-.')
+            for i in range(self.algo_count):  # For each bandit algorithm,
+
+                empirical_pulls = self.cum_pulls[i][:, col]
+                self.ph.add_curve(empirical_pulls, mh.stringify(self.true_means[col]) + self.algorithms_to_run[i][0],
+                                  col, i+1)
 
         self.ph.plot_curves()
 
     def plot_regret(self):
 
         self.ph.clear_curves()
-        true_means_string = "True means of arms: " +  mh.stringify_list(self.true_means)
+        true_means_string = "True means of arms: " + mh.stringify_list(self.true_means)
 
-        self.ph.initiate_figure("Regret of algorithms vs Time\n" + true_means_string, "Time T", "Regret", x_log=False, y_log=False)
-
+        self.ph.initiate_figure("Regret of algorithms vs Time\n" + true_means_string, "Time T", "Regret",
+                                x_log=False, y_log=False)
 
         # ph.add_curve(self.cum_optimal_reward, "Optimal Reward", 1)
         # ph.add_curve(self.cum_reward_empirical, "Empirical Reward", 2)
         # ph.add_curve(self.cum_reward_empirical_incremental, "Empirical Reward" incremental, 3)
 
         self.ph.add_curve(self.cum_regret_theo_bound, "Theoretical Upper Bound", 4)
-        self.ph.add_curve(self.cum_regret_empirical, "UCB1", 5)
-        self.ph.add_curve(self.cum_regret_empirical_incremental, "UCB-Inc", 6)
-        self.ph.add_curve(self.cum_regret_empirical_doubling, "UCB-Doub", 7)
-        self.ph.add_curve(self.cum_regret_empirical_doubling_tr, "UCB-Doub-TR", 8)
+
+        for i in range(self.algo_count):  # For each bandit algorithm,
+            self.ph.add_curve(self.cum_regret_empirical[i], self.algorithms_to_run[i][0], 5+i)
 
         self.ph.plot_curves()
 

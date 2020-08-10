@@ -1,4 +1,5 @@
 import abc  # Abstract Base Class
+from Helpers.misc_helper import MiscellaneousHelper as mh
 
 
 class UCB(abc.ABC):
@@ -9,8 +10,9 @@ class UCB(abc.ABC):
 
     upper_confidence_bound = None
     arm_pulls_by_time = None
+    radius_function = None
 
-    def __init__(self, arms, t, n):
+    def __init__(self, arms, t, n, radius_function=mh.textbook_radius):
         self.arms = arms
         self.T = t
         self.N = n
@@ -19,6 +21,10 @@ class UCB(abc.ABC):
         self.upper_confidence_bound = [0] * self.K
 
         self.arm_pulls_by_time = [[0] * self.K]
+
+        self.radius_function = radius_function
+
+        a = 5
 
     @abc.abstractmethod
     def play_arms(self):
