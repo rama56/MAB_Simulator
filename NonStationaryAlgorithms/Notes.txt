@@ -1,0 +1,16 @@
+This folder contains Algorithms for the two-armed slowly-varying bandits problem.
+We implement 3 algorithms and compare their performances.
+
+1) Our Algorithm AlgGaEn.
+
+2) SW-UCB# : Sliding Window - UCB# from "On Abruptly-Changing and Slowly-Varying Multi-Armed Bandit Problems",
+ Wei & Srivastava, ACC 2018.
+
+3) R-EXP3 : "Optimal Exploration–Exploitation in a Multi-armed Bandit Problem with Non-stationary Rewards",
+Besbse et. al., Stochastic Systems 2019.
+A conference version of this is "Stochastic Multi-Armed-Bandit Problem with Non-stationary Rewards",
+Besbes et al., NIPS 2014.
+
+
+
+Is 3) really worth comparing against? Very old and basic looking stuff?

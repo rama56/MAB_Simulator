@@ -1,12 +1,11 @@
 
 from unittest import TestCase
 
-from Algorithms.ucb1 import UCB1
-from Algorithms.ucb_doubling import UCBDoubling
-from Algorithms.ucb_incremental import UCBIncremental
-from Helpers.misc_helper import MiscellaneousHelper as mh
-from arm import Arm
-from multi_armed_bandit import MultiArmedBandit
+from UrgentBandits.ucb1 import UCB1
+from UrgentBandits.ucb_doubling import UCBDoubling
+from UrgentBandits.ucb_incremental import UCBIncremental
+from BanditElements.arm import Arm
+from BanditInstance.multi_armed_bandit import MultiArmedBandit
 
 
 class Test(TestCase):
@@ -26,10 +25,11 @@ class Test(TestCase):
     # end def
 
     def test_mab_run(self):
-        mab = MultiArmedBandit(k=5, t=10 ** 4)
+        mab = MultiArmedBandit(k=2, t=10 ** 4)
 
         algorithms_to_run = [("UCB1", UCB1), ("UCB-Inc", UCBIncremental),
-                             ("UCB-Doub-TR", UCBDoubling, mh.ucb_doubling_radius), ("UCB-Doub", UCBDoubling)]
+                             # ("UCB-Doub-TR", UCBDoubling, mh.ucb_doubling_radius),
+                             ("UCB-Doub", UCBDoubling)]
 
         mab.set_algorithms(algorithms_to_run)
 

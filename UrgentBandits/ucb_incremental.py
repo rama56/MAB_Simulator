@@ -1,19 +1,13 @@
-from Algorithms.ucb import UCB
+from UrgentBandits.ucb import UCB
 
 from Helpers.misc_helper import MiscellaneousHelper as mh
-from Helpers.math_helper import MathHelper as rvh
 
 
-class UCBDoubling(UCB):
+class UCBIncremental(UCB):
 
-    radius_function = None
-
-    def __init__(self, arms, t, n, radius_function=None):
+    def __init__(self, arms, t, n):
 
         super().__init__(arms, t, n)
-
-        if radius_function is not None:
-            self.radius_function = radius_function
 
     def play_arms(self):
         rewards = [0]
@@ -28,11 +22,11 @@ class UCBDoubling(UCB):
             n = n + 1
 
         # From time t = 1
-        for t in range(1, rvh.ceiled_log_base_2(self.N) + 1):
+        for t in range(1, mh.ciel_root(self.N) + 1):
             self.revise_ucbs(n)
 
-            # pull the arm with highest UCB 2 power t times
-            pulls_this_iteration = 2 ** t
+            # pull the arm with highest UCB 2t-1 times
+            pulls_this_iteration = 2 * t - 1
 
             arm_with_highest_ucb = mh.get_maximum_index(self.upper_confidence_bound)
 
@@ -50,7 +44,7 @@ class UCBDoubling(UCB):
 
     def revise_ucbs(self, t):
         for i in range(self.K):
-            self.upper_confidence_bound[i] = self.radius_function(t, self.arms[i].pull_count) + \
+            self.upper_confidence_bound[i] = mh.textbook_radius(t, self.arms[i].pull_count) + \
                                              self.arms[i].empirical_mean
         # end for
     # end def

@@ -1,0 +1,6 @@
+# ignore all directories/files within these paths.
+Pics/
+DataFiles/
+venv/
+.idea/
+__pycache__/

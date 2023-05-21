@@ -1,0 +1,14 @@
+Figure12.png -> Instance 8 with buf=lambda/3delta.
+Figure13.png -> Instance 8 with buf=lambda/delta.
+Figure14 ->Instance 9
+
+Figure15,16,17 -> Instance 8, RExp3 & Exp3s -> Algos react to the cross-over.
+Figure18,19,20 -> Instance 8, All 4 -> UCB-SWR# > OurAlgo > RExp3, Exp3S
+Fig21,22,23 -> Instance 10, Gaussian rewards (variance 1/4)
+Fig24 -> Instance 8, 5 runs - SW-UCB has lesser average regret, but has high variance. OurAlgo is more stable.
+Fig25 -> Instance 10, 5 runs -  Not so great for us. SW-UCB does well.
+Fig 26,27 -> Instance 12, 1 run - SW-UCB finally suffers! Large delta did the trick.
+Fig 28,29 -> Same as above, 5 runs.
+Fig 30 --> Instance 4, 5 runs SW-UCB is good. Our Algo is good. RExp3, Exp3S do bad.
+Fig 31,32,33 -> Instance 14, 1 run - SW-UCB suffers, e^13 time.
+Fig 34 --> Instance 14, 1 run SW-UCB suffers, e^13 time.

@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-from arm import Arm
+from BanditElements.arm import Arm
 from Helpers.math_helper import MathHelper as rvh
 
 
@@ -59,7 +59,7 @@ class MiscellaneousHelper:
 
     @staticmethod
     def get_theoretical_constants(sum_del_inv, sum_del):
-        mult_constant = 2 * sum_del_inv
+        mult_constant = 8 * sum_del_inv
         addi_constant = rvh.func_of_pi(add=1, power=2, mult=1 / 3) * sum_del
 
         return mult_constant, addi_constant
@@ -81,11 +81,15 @@ class MiscellaneousHelper:
     @staticmethod
     def stringify(fl):
         return str(round(fl, 2))
+        # return str(fl)
 
     @staticmethod
     def stringify_list(fl_list):
         readable = ""
+        # i = 0
         for fl in fl_list:
+            # print(i, fl)
+            # i = i+1
             readable = readable + "  " + MiscellaneousHelper.stringify(fl)
 
         return readable

@@ -1,4 +1,4 @@
-from Algorithms.ucb import UCB
+from UrgentBandits.ucb import UCB
 
 from Helpers.misc_helper import MiscellaneousHelper as mh
 

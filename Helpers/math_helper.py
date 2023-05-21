@@ -6,15 +6,20 @@ import math
 class MathHelper:
 
     @staticmethod
-    def get_uniform_sample(lower, upper, size=1):
+    def get_uniform_sample(lower, upper, size=None):
         return np.random.uniform(lower, upper, size)
 
     @staticmethod
-    def get_bernoulli_sample(p, size=1):
+    def get_bernoulli_sample(p, size=None):
         # Returns 0 with probability 1-p,
         #         1 with probability p
 
-        return bernoulli.rvs(p=p, size=size)
+        return bernoulli.rvs(p=p, size=size, )
+
+    @staticmethod
+    def get_gaussian_sample(mean, variance):
+        st_d = variance**(1/2)
+        return np.random.normal(loc=mean, scale=st_d)
 
     ''' Deliberate choice to not overload (instead, redefine) as it 
     adds instruction cycles to a repeatedly called method'''
@@ -41,7 +46,33 @@ class MathHelper:
         return np.log(x)
 
     @staticmethod
+    def custom_log(x, base):
+        return math.log(x, base)
+
+    @staticmethod
     def ceiled_log_base_2(x):
         a = np.log2(x)
         return math.ceil(a)
         pass
+
+    @staticmethod
+    def sqrt(x):
+        a = np.sqrt(x)
+        return a
+
+    @staticmethod
+    def absolute(x):
+        if x > 0:
+            return x
+        else:
+            return -x
+
+    @staticmethod
+    def ceil(x):
+        return math.ceil(x)
+
+    @staticmethod
+    def isinf(x):
+        return math.isinf(x)
+
+

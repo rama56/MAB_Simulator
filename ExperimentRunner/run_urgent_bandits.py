@@ -2,13 +2,12 @@
 This script runs lots of instances of MABs with different algorithms and plots the average regret of
 different algorithms
 '''
-from Algorithms.ucb1 import UCB1
-from Algorithms.ucb_doubling import UCBDoubling
-from Algorithms.ucb_incremental import UCBIncremental
-from multi_armed_bandit import MultiArmedBandit
+from UrgentBandits.ucb1 import UCB1
+from UrgentBandits.ucb_doubling import UCBDoubling
+from UrgentBandits.ucb_incremental import UCBIncremental
+from BanditInstance.multi_armed_bandit import MultiArmedBandit
 from Helpers.plot_helper import PlotHelper
 from Helpers.log_helper import LogHelper
-from Helpers.misc_helper import MiscellaneousHelper as mh
 
 
 class ExperimentRunner:
@@ -66,9 +65,9 @@ class ExperimentRunner:
 
     # end def
 
-    def plot_graph(self):
+    def plot_graph(self, message):
         ph = PlotHelper()
-        ph.initiate_figure("Average regret vs Time", "Time", "Regret", x_log=False, y_log=False)
+        ph.initiate_figure("Average regret vs Time\n" + message, "Rounds n", "Regret", x_log=False, y_log=False)
 
         ph.add_curve(self.average_regret_theo, "Theoretical Upper Bound", 4)
 
@@ -87,10 +86,14 @@ if __name__ == "__main__":
     algorithms_to_run = [("UCB1", UCB1), ("UCB-Inc", UCBIncremental), ("UCB-Doub", UCBDoubling)]
         # ,("UCB-Doub-TR", UCBDoubling, mh.ucb_doubling_radius)]
 
-    er = ExperimentRunner(2, 5, 10 ** 5, algorithms_to_run)
+    runs = 5
+    arms = 5
+    er = ExperimentRunner(runs, arms, 10 ** 5, algorithms_to_run)
 
     er.run()
 
-    er.plot_graph()
+    message = "Runs = {0}   Arms = {1}".format(runs, arms)
+
+    er.plot_graph(message)
 
 # end

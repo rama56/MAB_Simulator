@@ -1,9 +1,6 @@
 import numpy as np
 
-from Algorithms.ucb_doubling import UCBDoubling
 from Helpers.log_helper import LogHelper
-from Algorithms.ucb1 import UCB1
-from Algorithms.ucb_incremental import UCBIncremental
 from Helpers.math_helper import MathHelper as rvh
 from Helpers.misc_helper import MiscellaneousHelper as mh
 from Helpers.plot_helper import PlotHelper
@@ -23,12 +20,13 @@ class MultiArmedBandit:
     algorithms_to_run = None
     algo_count = 0
 
+    algo_ran = False
     cum_reward_empirical = None
 
     """ Objects that are a part of the analysis of the performance. """
 
     best_arm = None
-    deltas = []
+    Deltas = []
 
     # Cumulative regret, rewards are computed for all time-steps, as a list.
     cum_optimal_reward = None
@@ -40,19 +38,18 @@ class MultiArmedBandit:
     theoretical_bounds_arm_pulls = None
 
     """ Functions to create, run, and analyse MABs. """
-
     def __init__(self, k=10, t=10**6):
-        self.ph = PlotHelper()
+        # self.ph = PlotHelper()
         self.logger = LogHelper.get_logger(__name__)
 
         # Set the parameters of number of arms, time horizon arbitrarily.
         self.K = k
         self.T = t
+        self.Deltas = [0] * self.K
 
-        self.deltas = [0] * self.K
-
-        # Create the arms
-        self.true_means, self.arms = mh.get_arms(self.K, self.T)
+        # Commenting out as I'm anyway overwriting in the slowly_varying_mab.py anyway.
+        # # Create the arms
+        # self.true_means, self.arms = mh.get_arms(self.K, self.T)
 
     def set_algorithms(self, algorithms_to_run):
         self.algorithms_to_run = algorithms_to_run
@@ -62,7 +59,7 @@ class MultiArmedBandit:
         self.cum_regret_empirical = [None] * self.algo_count
         self.cum_reward_empirical = [None] * self.algo_count
 
-    def run_bandit_algorithm(self):
+    def run_bandit_algorithm(self, verbose=False):
 
         for i in range(self.algo_count):
             algo = self.algorithms_to_run[i]
@@ -70,7 +67,7 @@ class MultiArmedBandit:
             algo_name = algo[0]
             algo_class = algo[1]
 
-            algorithm = algo_class(arms=self.arms, t=self.T, n=self.T)
+            algorithm = algo_class(arms=self.arms, t=self.T, n=self.T, verbose=verbose)
 
             if len(algo) > 2:
                 algorithm = algo_class(arms=self.arms, t=self.T, n=self.T, radius_function=algo[2])
@@ -82,7 +79,7 @@ class MultiArmedBandit:
             rewards_np_array = np.array(rewards_list)
             self.cum_reward_empirical[i] = np.cumsum(rewards_np_array)
 
-            pull_matrix = algorithm.arm_pulls_by_time
+            pull_matrix = algorithm.arm_pulled_at_time
             pull_ndarray = np.array(pull_matrix)
 
             self.cum_pulls[i] = np.cumsum(pull_ndarray, axis=0)
@@ -99,9 +96,9 @@ class MultiArmedBandit:
         mean_of_best_arm = self.true_means[self.best_arm]
 
         for i in range(self.K):
-            self.deltas[i] = mean_of_best_arm - self.true_means[i]
+            self.Deltas[i] = mean_of_best_arm - self.true_means[i]
 
-        del_sq_invs = mh.get_instance_dependent_square_inverses(self.deltas, self.best_arm)
+        del_sq_invs = mh.get_instance_dependent_square_inverses(self.Deltas, self.best_arm)
 
         addi_constant = rvh.func_of_pi(add=1, power=2, mult=1 / 3)
 
@@ -127,12 +124,11 @@ class MultiArmedBandit:
         for i in range(self.algo_count):
             # Compute cumulative empirical regret
             self.cum_regret_empirical[i] = self.cum_optimal_reward - self.cum_reward_empirical[i]
-
     # end def analyse_regret
 
     def plot_suboptimal_arm(self):
 
-        self.ph.initiate_figure("#Pulls of sub-optimal arms vs Time", "Time T", "#Pulls", x_log=False, y_log=True)
+        self.ph.initiate_figure("#Pulls of sub-optimal arms vs Time", "Rounds n", "#Pulls", x_log=False, y_log=True)
 
         for col in range(self.K):   # For each arm,
             theoretical_bound = self.theoretical_bounds_arm_pulls[:, col]
@@ -153,7 +149,7 @@ class MultiArmedBandit:
         self.ph.clear_curves()
         true_means_string = "True means of arms: " + mh.stringify_list(self.true_means)
 
-        self.ph.initiate_figure("Regret of algorithms vs Time\n" + true_means_string, "Time T", "Regret",
+        self.ph.initiate_figure("Regret of algorithms vs Time\n" + true_means_string, "Rounds n", "Regret",
                                 x_log=False, y_log=False)
 
         # ph.add_curve(self.cum_optimal_reward, "Optimal Reward", 1)
@@ -199,7 +195,6 @@ class MultiArmedBandit:
         # self.logger.info("UCB-Doub Empirical reward = {0}".format(self.cum_optimal_reward[-1]))
         #
         # self.logger.info("UCB-Doub-TR Empirical reward = {0}".format(self.cum_optimal_reward[-1]))
-
     # end def
 
     def analyse_common_stats(self):
@@ -208,9 +203,9 @@ class MultiArmedBandit:
         mean_of_best_arm = self.true_means[self.best_arm]
 
         for i in range(self.K):
-            self.deltas[i] = mean_of_best_arm - self.true_means[i]
+            self.Deltas[i] = mean_of_best_arm - self.true_means[i]
 
-        sum_del_inv, sum_del = mh.get_instance_dependent_values(self.best_arm, self.deltas)
+        sum_del_inv, sum_del = mh.get_instance_dependent_values(self.best_arm, self.Deltas)
 
         mult_constant, addi_constant = mh.get_theoretical_constants(sum_del_inv, sum_del)
 
